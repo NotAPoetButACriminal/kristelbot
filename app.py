@@ -20,35 +20,43 @@ analysis_config = {
         "sifra": "039",
         "geni": "svih",
         "panel": "Exome 2.0 (Illumina)",
-        "ograda": ""
+        "ograda": "",
+        "instrument": "NextSeq 2000 (Illumina)"
+        
     },
     "pWES": {
         "naziv": "Sekvenciranje celog egzoma",
         "sifra": "040",
         "geni": "svih",
         "panel": "Exome 2.0 (Illumina)",
-        "ograda": ""
+        "ograda": "",
+        "instrument": "NextSeq 2000 (Illumina)"
+        
     },
     "RFZO": {
         "naziv": "Sekvenciranje kliničkog egzoma",
         "sifra": "037",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",
-        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani."
+        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
+        "instrument": "NextSeq 550 (Illumina)"
+        
     },
     "SOVO": {
         "naziv": "Sekvenciranje kliničkog egzoma",
         "sifra": "037-SOVO",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",
-        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani."
+        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
+        "instrument": "NextSeq 550 (Illumina)"
     },
     "NGS": {
         "naziv": "Sekvenciranje kliničkog egzoma",
         "sifra": "018",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",
-        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani."
+        "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
+        "instrument": "NextSeq 550 (Illumina)"
     }
 }
 
@@ -99,6 +107,7 @@ with st.container(border=True):
     analiza_geni = analysis_config[analiza_vrsta]["geni"]
     analiza_panel = analysis_config[analiza_vrsta]["panel"]
     CES_ograda = analysis_config[analiza_vrsta]["ograda"]
+    analiza_instrument = analysis_config[analiza_vrsta]["instrument"]
     analiza_kod = analiza_vrsta
 
 # Block 3
@@ -228,9 +237,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
         if not str(var.get("gnomadE", "")): missing_fields.append(f"GnomAD Exomes (Varijanta {i+1})")
         if not str(var.get("gnomadG", "")): missing_fields.append(f"GnomAD Genomes (Varijanta {i+1})")
 
-    # --- FINAL DECISION ---
     if len(missing_fields) > 0:
-        # Halt and show the user exactly what they missed
         error_msg = "**Ne možete generisati izveštaj. Molimo popunite sledeća polja:**\n"
         for field in missing_fields:
             error_msg += f"- {field}\n"
@@ -239,8 +246,6 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
     else:
         try:
             doc = DocxTemplate("izveštaj_template.docx")
-            
-            # Now the variables strictly match the template tags!
             context = {
                 "datum": datum.strftime("%d.%m.%Y."),
                 "ustanova": ustanova,
@@ -265,7 +270,8 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "pacijent_ime_genitiv": pacijent_ime_genitiv,
                 "varijante": st.session_state.varijante,
                 "analizator": analizator,
-                "literatura": st.session_state.literatura
+                "literatura": st.session_state.literatura,
+                "analiza_instrument": analiza_instrument
             }
 
             doc.render(context)
@@ -277,7 +283,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
             st.download_button(
                 label="⬇️ Preuzmi .docx",
                 data=bio.getvalue(),
-                file_name=f"I-01-{analiza_sifra}-{pacijent_broj}.docx",
+                file_name=f"Izveštaj {analiza_kod} I-01-{analiza_sifra}-{pacijent_broj}_{pacijent_ime}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
         except Exception as e:

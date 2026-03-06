@@ -4,7 +4,7 @@ import io
 from datetime import datetime
 
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
-st.title("IMGGI Genetički Izveštaj")
+st.title("RFZO Genetički Izveštaj")
 
 # --- INITIALIZE SESSION STATE ---
 if "varijante" not in st.session_state:

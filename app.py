@@ -68,7 +68,7 @@ analysis_config = {
 }
 
 ACMG_criteria = {
-    "PM5_Moderate": "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena missense varijanta (PM5_Moderate). ",
+    "PM5_Moderate": "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena missense varijanta (PM5_Moderate).",
     "PM2_Supporting": "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Supporting).",
     "PP2_Supporting": "Varijanta se nalazi u genu u kojem su missense variajnte čest uzrok bolesti (PP2_Supporting),",
     "BP4_Supporting": "međutim, kompjuterski prediktivni skorovi idu u prilog njenoj benignosti (BP4_Supporting)."
@@ -186,6 +186,27 @@ with st.container(border=True):
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
                                                "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
+            
+            st.divider()
+            criteria = st.multiselect(
+                "Izaberite ACMG kriterijume:", 
+                list(ACMG_criteria.keys()),
+                key=f"ms_{vid}"
+            )
+
+            sentences = []
+            for criterium in criteria:
+                varijanta[f"sentence_{criterium}"] = st.text_area(f"{criterium}",
+                                                                  value=varijanta.get(f"sentence_{criterium}", ACMG_criteria[criterium]),
+                                                                  key=f"{criterium}_{vid}"
+                )
+                sentences.append(varijanta[f"sentence_{criterium}"])
+            
+            varijanta["acmg_oznake"] = ", ".join(criteria)
+            varijanta["acmg_recenice"] = " ".join(sentences)
+            st.divider()
+
+
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)

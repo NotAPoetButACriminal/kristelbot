@@ -1,6 +1,7 @@
 import streamlit as st
 from docxtpl import DocxTemplate
 import io
+import uuid
 from datetime import datetime
 
 # --- INITIALIZE SESSION STATE ---
@@ -9,11 +10,17 @@ if "varijante" not in st.session_state:
 
 if "literatura" not in st.session_state:
     st.session_state.literatura = [
-        "Richards et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genetics in Medicine 2015.",
-        "https://varsome.com"
+        {
+            "id": str(uuid.uuid4()),
+            "tekst": "Richards et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genetics in Medicine 2015."
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "tekst": "https://varsome.com"
+        }
     ]
 
-# Analysis config
+# Config
 analysis_config = {
     "WRFZO": {
         "naziv": "Sekvenciranje celog egzoma",
@@ -58,6 +65,13 @@ analysis_config = {
         "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
         "instrument": "NextSeq 550 (Illumina)"
     }
+}
+
+ACMG_criteria = {
+    "PM5_Moderate": "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena missense varijanta (PM5_Moderate). ",
+    "PM2_Supporting": "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Supporting).",
+    "PP2_Supporting": "Varijanta se nalazi u genu u kojem su missense variajnte čest uzrok bolesti (PP2_Supporting),",
+    "BP4_Supporting": "međutim, kompjuterski prediktivni skorovi idu u prilog njenoj benignosti (BP4_Supporting)."
 }
 
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
@@ -135,48 +149,50 @@ with st.container(border=True):
     segregaciona = st.checkbox("Neophodna segregaciona analiza")
 
     for i, varijanta in enumerate(st.session_state.varijante):
-        with st.expander(f"Varijanta {i+1}: {varijanta.get('gen', 'Novi Gen')}", expanded=True):
+        vid = varijanta.setdefault("id", str(uuid.uuid4()))
+
+        with st.expander(f"Varijanta {i+1}:", expanded=True):
             v_col1, v_col2, v_col3 = st.columns(3)
             
             with v_col1:
-                varijanta["gen"] = st.text_input("Gen", value=varijanta.get("gen", ""), key=f"gen_{i}")
-                varijanta["klasa"] = st.selectbox("Klasa", ["patogena varijanta (klasa 1)",
-                                                            "verovatno patogena varijanta (klasa 2)",
-                                                            "varijanta neodređenog značaja (klasa 3)",
-                                                            "verovatno benigna varijanta (klasa 4)",
-                                                            "benigna varijanta (klasa 5)"],
-                                                index=["patogena varijanta (klasa 1)",
-                                                        "verovatno patogena varijanta (klasa 2)",
-                                                        "varijanta neodređenog značaja (klasa 3)",
-                                                        "verovatno benigna varijanta (klasa 4)",
-                                                        "benigna varijanta (klasa 5)"].index(varijanta.get("klasa", "patogena varijanta (klasa 1)")), key=f"class_{i}")
-                varijanta["hromozom"] = st.text_input("Hromozom", value=varijanta.get("hromozom", ""), key=f"chr_{i}")
-                varijanta["gnomadE"] = st.text_input("GnomAD Exomes (%)", value=varijanta.get("gnomadE", "0.00%"), key=f"gnE_{i}")
+                varijanta["gen"] = st.text_input("Gen", key=f"gen_{vid}")
+                varijanta["klasa"] = st.selectbox("Klasa",
+                                                  ["patogena varijanta (klasa 1)",
+                                                   "verovatno patogena varijanta (klasa 2)",
+                                                   "varijanta neodređenog značaja (klasa 3)",
+                                                   "verovatno benigna varijanta (klasa 4)",
+                                                   "benigna varijanta (klasa 5)"],
+                                                  key=f"class_{vid}")
+                varijanta["hromozom"] = st.text_input("Hromozom", key=f"chr_{vid}")
+                varijanta["gnomadE"] = st.text_input("GnomAD Exomes (%)", value="0.00", key=f"gnE_{vid}")
 
             with v_col2:
-                varijanta["transkript"] = st.text_input("Transkript", value=varijanta.get("transkript", ""), key=f"trans_{i}")
-                varijanta["zigotnost"] = st.selectbox("Zigotnost", ["heterozigot","homozigot", "hemizigot"], index=["heterozigot", "homozigot", "hemizigot"].index(varijanta.get("zigotnost", "heterozigot")), key=f"zig_{i}")
-                varijanta["egzon"] = st.text_input("Egzon (npr. 4/6)", value=varijanta.get("egzon", ""), key=f"ex_{i}")
-                varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)", value=varijanta.get("gnomadG", "0.00%"), key=f"gnG_{i}")
+                varijanta["transkript"] = st.text_input("Transkript", key=f"trans_{vid}")
+                varijanta["zigotnost"] = st.selectbox("Zigotnost",
+                                                      ["heterozigot",
+                                                       "homozigot",
+                                                       "hemizigot"],
+                                                       key=f"zig_{vid}")
+                varijanta["egzon"] = st.text_input("Egzon (npr. 4/6)", key=f"ex_{vid}")
+                varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)", value="0.00", key=f"gnG_{vid}")
 
             with v_col3:
-                varijanta["HGVS"] = st.text_input("HGVS (npr. c.123A>G)", value=varijanta.get("HGVS", ""), key=f"hgvs_{i}")
-                varijanta["tip"] = st.text_input("Tip (npr. Missense)", value=varijanta.get("tip", ""), key=f"tip_{i}")
-                varijanta["skor"] = st.text_input("MetaRNN skor", value=varijanta.get("skor", ""), key=f"score_{i}")
+                varijanta["HGVS"] = st.text_input("HGVS (npr. c.123A>G)", key=f"hgvs_{vid}")
+                varijanta["tip"] = st.text_input("Tip (npr. Missense)", key=f"tip_{vid}")
+                varijanta["skor"] = st.text_input("MetaRNN skor", key=f"score_{vid}")
             
-            varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa: npr. 'urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)'", value=varijanta.get("bolest", ""), key=f"dis_{i}")
-            varijanta["model"] = st.selectbox("Model nasleđivanja", ["autozomno dominantno","autozomno recesivno", "autozomno dominantno, autozomno recesivno"], index=["autozomno dominantno","autozomno recesivno", "autozomno dominantno, autozomno recesivno"].index(varijanta.get("model", "autozomno dominantno")), key=f"mod_{i}")
+            varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa: npr. 'urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)'", key=f"dis_{vid}")
+            varijanta["model"] = st.selectbox("Model nasleđivanja",
+                                              ["autozomno dominantno",
+                                               "autozomno recesivno",
+                                               "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
             
-            if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{i}"):
+            if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
                 st.rerun()
 
     if st.button("➕ Dodaj novu varijantu"):
-        st.session_state.varijante.append({
-            "zigotnost": "heterozigot", "klasa": "patogena varijanta (klasa 1)", "HGVS": "", "gen": "", 
-            "bolest": "", "hromozom": "", "model": "autozomno dominantno", "transkript": "", 
-            "egzon": "", "skor": "", "gnomadE": "0.00", "gnomadG": "0.00", "tip": ""
-        })
+        st.session_state.varijante.append({"id": str(uuid.uuid4())})
         st.rerun()
 
 # Block 5
@@ -184,20 +200,22 @@ with st.container(border=True):
     st.subheader("📚 Literatura")
 
     for i, ref in enumerate(st.session_state.literatura):
+        lid = ref.setdefault("id", str(uuid.uuid4()))
+
         l_col1, l_col2 = st.columns([9, 1]) 
         
         with l_col1:
-            st.session_state.literatura[i] = st.text_area(f"Referenca {i+1}", value=ref, key=f"lit_{i}")
+            ref["tekst"] = st.text_area(f"Referenca {i+1}", value=ref.get("tekst", ""), key=f"lit_{lid}")
             
         with l_col2:
             st.write("") # Spacing to align with the text box
             st.write("")
-            if st.button("🗑️", key=f"del_lit_{i}", use_container_width=True):
+            if st.button("🗑️", key=f"del_lit_{lid}", use_container_width=True):
                 st.session_state.literatura.pop(i)
                 st.rerun()
 
     if st.button("➕ Dodaj referencu"):
-        st.session_state.literatura.append("")
+        st.session_state.literatura.append({"id": str(uuid.uuid4())})
         st.rerun()
 
 # Block 6

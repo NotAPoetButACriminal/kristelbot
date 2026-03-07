@@ -203,7 +203,7 @@ with st.container(border=True):
                 sentences.append(varijanta[f"sentence_{criterium}"])
             
             varijanta["acmg_oznake"] = ", ".join(criteria)
-            varijanta["acmg_recenice"] = " ".join(sentences)
+            varijanta["acmg_tekst"] = " ".join(sentences)
             st.divider()
 
 

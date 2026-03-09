@@ -3,6 +3,7 @@ from docxtpl import DocxTemplate
 import io
 import uuid
 from datetime import datetime
+from ACMG_criteria import ACMG_criteria
 
 # --- INITIALIZE SESSION STATE ---
 if "varijante" not in st.session_state:
@@ -67,12 +68,37 @@ analysis_config = {
     }
 }
 
-ACMG_criteria = {
-    "PM5_Moderate": "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena missense varijanta (PM5_Moderate).",
-    "PM2_Supporting": "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Supporting).",
-    "PP2_Supporting": "Varijanta se nalazi u genu u kojem su missense variajnte čest uzrok bolesti (PP2_Supporting),",
-    "BP4_Supporting": "međutim, kompjuterski prediktivni skorovi idu u prilog njenoj benignosti (BP4_Supporting)."
-}
+# ACMG_criteria = {
+#     "PVS1_Very Strong" : "Varijanta dovodi do uvođenja prevremenog stop kodona, te kao takva predstavlja „nultu“ varijantu u genu za koji je gubitak funkcije poznati mehanizam nastanka bolesti (PVS1_Very Strong).",
+#     "PS1_Strong" : "Prijavljena je alternativna patogena varijanta ___ koja dovodi do iste aminokiselinske promene (PS1_Strong).",
+#     "PS2_Strong" : "Varijanta je kod pacijenta nastala de novo i nije prisutna kod roditelja, uz potvrđeno biološko srodstvo i odsustvo kliničkih simptoma kod oba roditelja (PS2_Strong).",
+#     "PS3_Very Strong" : "Varijanta je u ClinVar, UniProt i LOVD bazama podataka kao i u literaturi opisana kao patogena [citat]",
+#     "PS3_Strong" : "Varijanta je u ClinVar, UniProt i LOVD bazama podataka kao i u literaturi opisana kao patogena [citat]",
+#     "PS3_Moderate" : "Varijanta je u ClinVar, UniProt i LOVD bazama podataka kao i u literaturi opisana kao patogena [citat]",
+#     "PS3_Supporting" : "Varijanta je u ClinVar, UniProt i LOVD bazama podataka kao i u literaturi opisana kao patogena [citat]",
+#     "PS4_Moderate" : "Varijanta je detektovana kod nekoliko pacijenata u srodstvu koji imaju kliničku dijagnozu (PS4_Moderate).",
+#     "PM1_Very Strong" : "Varijanta se nalazi u „hot-spot“ regionu proteina.",
+#     "PM1_Strong" : "Varijanta se nalazi u „hot-spot“ regionu proteina.",
+#     "PM1_Moderate" : "Varijanta se nalazi u „hot-spot“ regionu proteina.",
+#     "PM1_Supporting" : "Varijanta se nalazi u „hot-spot“ regionu proteina.",
+#     "PM2_Moderate" : "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Moderate).",
+#     "PM2_Supporting" : "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Moderate).",
+#     "PM3_Very Strong" : "Za recesivna oboljenja, varijanta je detektovana u homozigotnom stanju. (PM3_Very Strong).",
+#     "PM3_Strong" : "Za recesivna oboljenja, varijanta je detektovana u homozigotnom stanju. (PM3_Very Strong).",
+#     "PM3_Moderate" : "Za recesivna oboljenja, varijanta je detektovana u homozigotnom stanju. (PM3_Very Strong).",
+#     "PM3_Supporting" : "Za recesivna oboljenja, varijanta je detektovana u homozigotnom stanju. (PM3_Very Strong).",
+#     "PM4_Very_Strong" : "Varijanta dovodi do gubitka stop kodona i kao takva utiče na dužinu transkripta i posledično na strukturu i/ili funkciju proteina (PM4_Strong).",
+#     "PM4_Strong" : "Varijanta dovodi do gubitka stop kodona i kao takva utiče na dužinu transkripta i posledično na strukturu i/ili funkciju proteina (PM4_Strong).",
+#     "PM4_Moderate" : "Varijanta dovodi do gubitka stop kodona i kao takva utiče na dužinu transkripta i posledično na strukturu i/ili funkciju proteina (PM4_Strong).",
+#     "PM4_Supporting" : "Varijanta dovodi do gubitka stop kodona i kao takva utiče na dužinu transkripta i posledično na strukturu i/ili funkciju proteina (PM4_Strong).",
+#     "PM5_Very Strong" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Moderate).",
+#     "PM5_Strong" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Moderate).",
+#     "PM5_Moderate" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Moderate).",
+#     "PM5_Supporting" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Moderate).",
+#     "PM2_Supporting": "Varijanta je nađena sa niskom učestalošću u GnomAD Exomes i GnomAD Genomes populacionim bazama podataka (PM2_Supporting).",
+#     "PP2_Supporting": "Varijanta se nalazi u genu u kojem su missense variajnte čest uzrok bolesti (PP2_Supporting),",
+#     "BP4_Supporting": "međutim, kompjuterski prediktivni skorovi idu u prilog njenoj benignosti (BP4_Supporting)."
+# }
 
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
 st.title("RFZO Genetički Izveštaj")
@@ -191,6 +217,7 @@ with st.container(border=True):
             criteria = st.multiselect(
                 "Izaberite ACMG kriterijume:", 
                 list(ACMG_criteria.keys()),
+                placeholder="Type to search",
                 key=f"ms_{vid}"
             )
 

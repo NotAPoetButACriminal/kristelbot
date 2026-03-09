@@ -237,7 +237,7 @@ with st.container(border=True):
 # Block 6
 with st.container(border=True):
     st.subheader("✍️ Analizator")
-    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita","Niko"], label_visibility="collapsed")
+    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi","Niko"], label_visibility="collapsed")
 
 # Report Generation
 

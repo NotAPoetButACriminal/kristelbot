@@ -26,5 +26,7 @@ ACMG_criteria = {
     "PM5_Moderate" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Moderate).",
     "PM5_Supporting" : "Varijanta se nalazi u kodonu u kojem je prethodno prijavljena patogena varijanta (PM5_Supporting).",
     "PP1_Moderate" : "Uočeni fenotip kod pacijenta je u literaturi i bazama podataka asociran sa genom ___ (PP1_Moderate).",
-    "PP1_Supporting" : "Uočeni fenotip kod pacijenta je u literaturi i bazama podataka asociran sa genom ___ (PP1_Supporting)."
+    "PP1_Supporting" : "Uočeni fenotip kod pacijenta je u literaturi i bazama podataka asociran sa genom ___ (PP1_Supporting).",
+    "PP2_Moderate" : "Varijanta se nalazi u genu u kome su missense varijante čest uzrok nastanka bolesti (PP2_Moderate).",
+    "PP2_Supporting" : "Varijanta se nalazi u genu u kome su missense varijante čest uzrok nastanka bolesti (PP2_Supporting).",
 }

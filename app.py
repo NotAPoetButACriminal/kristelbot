@@ -6,7 +6,7 @@ from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from analysis_config import analysis_config
 
-# --- INITIALIZE SESSION STATE ---
+# Initialize
 if "varijante" not in st.session_state:
     st.session_state.varijante = []
 
@@ -22,52 +22,6 @@ if "literatura" not in st.session_state:
         }
     ]
 
-# analysis_config = {
-#     "WRFZO": {
-#         "naziv": "Sekvenciranje celog egzoma",
-#         "sifra": "039",
-#         "geni": "svih",
-#         "panel": "Exome 2.0 (Illumina)",
-#         "ograda": "",
-#         "instrument": "NextSeq 2000 (Illumina)"
-        
-#     },
-#     "pWES": {
-#         "naziv": "Sekvenciranje celog egzoma",
-#         "sifra": "040",
-#         "geni": "svih",
-#         "panel": "Exome 2.0 (Illumina)",
-#         "ograda": "",
-#         "instrument": "NextSeq 2000 (Illumina)"
-        
-#     },
-#     "RFZO": {
-#         "naziv": "Sekvenciranje kliničkog egzoma",
-#         "sifra": "037",
-#         "geni": "4813 klinički relevantnih",
-#         "panel": "TruSight One (Illumina)",
-#         "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
-#         "instrument": "NextSeq 550 (Illumina)"
-        
-#     },
-#     "SOVO": {
-#         "naziv": "Sekvenciranje kliničkog egzoma",
-#         "sifra": "037-SOVO",
-#         "geni": "4813 klinički relevantnih",
-#         "panel": "TruSight One (Illumina)",
-#         "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
-#         "instrument": "NextSeq 550 (Illumina)"
-#     },
-#     "NGS": {
-#         "naziv": "Sekvenciranje kliničkog egzoma",
-#         "sifra": "018",
-#         "geni": "4813 klinički relevantnih",
-#         "panel": "TruSight One (Illumina)",
-#         "ograda": "Geni koji se ne nalaze na TSO panelu nisu analizirani. ",
-#         "instrument": "NextSeq 550 (Illumina)"
-#     }
-# }
-
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
 st.title("RFZO Genetički Izveštaj")
 
@@ -76,9 +30,10 @@ with st.container(border=True):
     st.subheader("📋 Opšti Podaci")
 
     datum = st.date_input("Datum izveštaja", format="DD.MM.YYYY", min_value=datetime(1900, 1, 1))
-    ustanova = ustanova_opcija = st.selectbox("Ustanova", ["Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
-                                                        "Univerzitetska dečja klinika",
-                                                        "drugo"])
+    ustanova = ustanova_opcija = st.selectbox("Ustanova",
+                                              ["Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
+                                              "Univerzitetska dečja klinika",
+                                              "drugo"])
     if ustanova_opcija == "drugo":
         ustanova = st.text_input("Druga ustanova")
     else:
@@ -133,7 +88,7 @@ with st.container(border=True):
 
     pacijent_dijagnoza = st.text_input("Dijagnoza")
 
-    HPO = st.text_input("Analizirani HPO termini (npr. Flexion contracture HP:0001371, Multiple joint contractures HP:0002828,)")
+    HPO = st.text_area("Analizirani HPO termini (npr. Flexion contracture HP:0001371, Multiple joint contractures HP:0002828,)")
 
 
 # Block 4

@@ -91,7 +91,6 @@ with st.container(border=True):
 
     col5, col6 = st.columns([6, 1])
     with col6:
-        st.markdown("<br>", unsafe_allow_html=True)
         rucni_unos_hpo = st.toggle("Ručni HPO")
     with col5:
         if not rucni_unos_hpo:

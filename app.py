@@ -4,6 +4,7 @@ import io
 import uuid
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
+from HPO import HPO
 from analysis_config import analysis_config
 
 # Initialize
@@ -88,7 +89,16 @@ with st.container(border=True):
 
     pacijent_dijagnoza = st.text_input("Dijagnoza")
 
-    HPO = st.text_area("Analizirani HPO termini (npr. Flexion contracture HP:0001371, Multiple joint contractures HP:0002828,)")
+    col5, col6 = st.columns([6, 1])
+    with col6:
+        st.markdown("<br>", unsafe_allow_html=True)
+        rucni_unos_hpo = st.toggle("Ručni HPO")
+    with col5:
+        if not rucni_unos_hpo:
+            HPO_termini = st.multiselect("Odaberite HPO termine:", HPO, placeholder="Type to search")
+            HPO = ", ".join(HPO_termini)
+        else:
+            HPO = st.text_area("Analizirani HPO termini (npr. Flexion contracture HP:0001371, Multiple joint contractures HP:0002828,)")
 
 
 # Block 4

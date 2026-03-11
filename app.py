@@ -272,6 +272,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "segregaciona": segregaciona,
                 "pacijent_ime_genitiv": pacijent_ime_genitiv,
                 "varijante": st.session_state.varijante,
+                "treba_napomena": treba_napomena,
                 "napomena" : napomena,
                 "analizator": analizator,
                 "literatura": st.session_state.literatura,

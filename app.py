@@ -54,9 +54,9 @@ with st.container(border=True):
             pacijent_uzorak = st.text_input("Unesite tip uzorka")
         else:
             pacijent_uzorak = uzorak_opcija
-        ima_eksterni = st.checkbox("Eksterni broj uzorka")
+        ima_eksterni = st.toggle("Eksterni broj uzorka")
         if ima_eksterni:
-            pacijent_eksterni = st.text_input("")
+            pacijent_eksterni = st.text_input("", label_visibility="collapsed")
             if not pacijent_eksterni:
                 pacijent_eksterni = "-"
         else:
@@ -89,9 +89,10 @@ with st.container(border=True):
 
     pacijent_dijagnoza = st.text_input("Dijagnoza")
 
-    col5, col6 = st.columns([6, 1])
+    col5, col6 = st.columns([5, 1])
     with col6:
-        rucni_unos_hpo = st.toggle("Ručni HPO")
+        st.space(size="small")
+        rucni_unos_hpo = st.toggle("Ručni HPO", help = "Override kada želite da kopirate HPO termine od nekud")
     with col5:
         if not rucni_unos_hpo:
             HPO_termini = st.multiselect("Odaberite HPO termine:", HPO, placeholder="Type to search")
@@ -104,7 +105,7 @@ with st.container(border=True):
 with st.container(border=True):
     st.subheader("🧬 Rezultat")
     rezultat_rezultat = st.selectbox("Rezultat", ["NEGATIVAN", "POZITIVAN", "NEODREĐEN"])
-    segregaciona = st.checkbox("Neophodna segregaciona analiza")
+    segregaciona = st.toggle("Neophodna segregaciona analiza")
 
     for i, varijanta in enumerate(st.session_state.varijante):
         vid = varijanta.setdefault("id", str(uuid.uuid4()))
@@ -145,7 +146,6 @@ with st.container(border=True):
                                                "autozomno recesivno",
                                                "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
             
-            st.divider()
             criteria = st.multiselect(
                 "Izaberite ACMG kriterijume:", 
                 list(ACMG_criteria.keys()),
@@ -163,9 +163,7 @@ with st.container(border=True):
             
             varijanta["acmg_oznake"] = ", ".join(criteria)
             varijanta["acmg_tekst"] = " ".join(sentences)
-            st.divider()
-
-
+            st.space(size="small")
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
@@ -174,6 +172,13 @@ with st.container(border=True):
     if st.button("➕ Dodaj novu varijantu"):
         st.session_state.varijante.append({"id": str(uuid.uuid4())})
         st.rerun()
+
+    treba_napomena = st.toggle("Napomena:", help = "Preporučivanje segregacione analize ne ide u napomenu već ima poseban toggle")
+    if treba_napomena:
+            napomena = st.text_area("",
+                                    label_visibility="collapsed",
+                                    height = "content",
+                                    value = "Kod pacijenta je detektovana jedna patogena genetička varijanta NM_000527.5:c.343C>T (p.Arg115Cys) u genu LDLR, koja nije direktno vezana za uočeni fenotip. Patogene genetičke varijante u ovom genu asocirane su sa razvojem familijarne hiperholesterolemije (eng. Hypercholesterolemia, familial, 1) [broj citata].")
 
 # Block 5
 with st.container(border=True):
@@ -267,6 +272,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "segregaciona": segregaciona,
                 "pacijent_ime_genitiv": pacijent_ime_genitiv,
                 "varijante": st.session_state.varijante,
+                "napomena" : napomena,
                 "analizator": analizator,
                 "literatura": st.session_state.literatura,
                 "analiza_instrument": analiza_instrument
@@ -286,3 +292,5 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
             )
         except Exception as e:
             st.error(f"Došlo je do greške: {e}")
+
+st.write("Sve želje, bagove ili primedbe na default vrednosti prijaviti na djordje.pavlovic@imgge.bg.ac.rs")

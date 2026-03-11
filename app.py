@@ -175,7 +175,7 @@ with st.container(border=True):
 
     treba_napomena = st.toggle("Napomena:", help = "Preporučivanje segregacione analize ne ide u napomenu već ima poseban toggle")
     if treba_napomena:
-            napomena = st.text_area("",
+            napomena = st.text_area("napomena",
                                     label_visibility="collapsed",
                                     height = "content",
                                     value = "Kod pacijenta je detektovana jedna patogena genetička varijanta NM_000527.5:c.343C>T (p.Arg115Cys) u genu LDLR, koja nije direktno vezana za uočeni fenotip. Patogene genetičke varijante u ovom genu asocirane su sa razvojem familijarne hiperholesterolemije (eng. Hypercholesterolemia, familial, 1) [broj citata].")

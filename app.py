@@ -105,7 +105,6 @@ with st.container(border=True):
 with st.container(border=True):
     st.subheader("🧬 Rezultat")
     rezultat_rezultat = st.selectbox("Rezultat", ["NEGATIVAN", "POZITIVAN", "NEODREĐEN"])
-    segregaciona = st.toggle("Neophodna segregaciona analiza")
 
     for i, varijanta in enumerate(st.session_state.varijante):
         vid = varijanta.setdefault("id", str(uuid.uuid4()))
@@ -140,12 +139,6 @@ with st.container(border=True):
                 varijanta["tip"] = st.text_input("Tip (npr. Missense)", key=f"tip_{vid}")
                 varijanta["skor"] = st.text_input("MetaRNN skor", key=f"score_{vid}")
             
-            varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa: npr. 'urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)'", key=f"dis_{vid}")
-            varijanta["model"] = st.selectbox("Model nasleđivanja",
-                                              ["autozomno dominantno",
-                                               "autozomno recesivno",
-                                               "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
-            
             criteria = st.multiselect(
                 "Izaberite ACMG kriterijume:", 
                 list(ACMG_criteria.keys()),
@@ -163,7 +156,17 @@ with st.container(border=True):
             
             varijanta["acmg_oznake"] = ", ".join(criteria)
             varijanta["acmg_tekst"] = " ".join(sentences)
-            st.space(size="small")
+            varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa: npr. 'urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)'", key=f"dis_{vid}")
+            varijanta["model"] = st.selectbox("Model nasleđivanja",
+                                              ["autozomno dominantno",
+                                               "autozomno recesivno",
+                                               "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
+            treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju")
+            if treba_obrazlozenje:
+                varijanta["obrazlozenje"] = st.text_area("obrazlozenje",
+                                                         label_visibility="collapsed",
+                                                         height = "content",
+                                                         value = "Ovaj redak genetički poremećaj se karakteriše multiplim kongenitalnim anomalijama, facijalnom dismorfijom, varijabilnim intelektualnim oštećenjem, usporenim psihomotornim razvojem, epileptičnim napadima, hipertrihozom i hiperplazijom gingiva.")
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
@@ -173,7 +176,9 @@ with st.container(border=True):
         st.session_state.varijante.append({"id": str(uuid.uuid4())})
         st.rerun()
 
+    segregaciona = st.toggle("Neophodna segregaciona analiza")
     treba_napomena = st.toggle("Napomena:", help = "Preporučivanje segregacione analize ne ide u napomenu već ima poseban toggle")
+    napomena = ""
     if treba_napomena:
             napomena = st.text_area("napomena",
                                     label_visibility="collapsed",

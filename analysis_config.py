@@ -3,7 +3,7 @@ analysis_config = {
         "naziv": "sekvenciranje celog egzoma",
         "sifra": "039",
         "geni": "svih",
-        "panel": "Exome 2.0 (Illumina)",
+        "panel": "Exome 2.5 (Illumina)",
         "ograda": "",
         "instrument": "NextSeq 2000 (Illumina)"
         
@@ -12,7 +12,7 @@ analysis_config = {
         "naziv": "sekvenciranje celog egzoma",
         "sifra": "040",
         "geni": "svih",
-        "panel": "Exome 2.0 (Illumina)",
+        "panel": "Exome 2.5 (Illumina)",
         "ograda": "",
         "instrument": "NextSeq 2000 (Illumina)"
         

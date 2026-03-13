@@ -33,16 +33,28 @@ st.title("RFZO Genetički Izveštaj")
 with st.container(border=True):
     st.subheader("📋 Opšti Podaci")
 
-    datum = st.date_input("Datum izveštaja", format="DD.MM.YYYY", min_value=datetime(1900, 1, 1))
-    ustanova = ustanova_opcija = st.selectbox("Ustanova",
+    datum = st.date_input("Datum izveštaja:",
+                          format="DD.MM.YYYY",
+                          min_value=datetime(1900, 1, 1))
+    
+    ustanova = ustanova_opcija = st.selectbox("Ustanova:",
                                               ["Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
-                                              "Univerzitetska dečja klinika",
-                                              "drugo"])
+                                               "Univerzitetska dečja klinika",
+                                               "UKCS - Klinika za ginekologiju i akušerstvo",
+                                               "UKCS - Klinika za neurologiju",
+                                               "UKCS - Klinika za nefrologiju",
+                                               "UKCS - Klinika za kardiologiju",
+                                               "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
+                                               "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
+                                               "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",
+                                               "drugo"])
     if ustanova_opcija == "drugo":
         ustanova = st.text_input("Druga ustanova")
     else:
         ustanova = ustanova_opcija
-    lekari = st.text_input("Lekari (koji upućuju)")
+    
+    lekari = st.text_input("Lekari:",
+                           placeholder = "dr Slavica Ostojić, dr Jovana Beđik, dr Jelena Kojović")
 
 # Block 2
 with st.container(border=True):
@@ -51,23 +63,32 @@ with st.container(border=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        analiza_vrsta = st.selectbox("Vrsta analize", options=list(analysis_config.keys()))
-        uzorak_opcija = st.selectbox("Tip uzorka", ["periferna krv", "izolovana DNK", "koštana srž", "amnionska tečnost", "horionske čupice","drugo"])
+        analiza_vrsta = st.selectbox("Vrsta analize:",
+                                     options = list(analysis_config.keys()))
+        
+        uzorak_opcija = st.selectbox("Tip uzorka",
+                                     ["periferna krv", "izolovana DNK", "koštana srž", "amnionska tečnost", "horionske čupice","drugo"])
         if uzorak_opcija == "drugo":
             pacijent_uzorak = st.text_input("Unesite tip uzorka")
         else:
             pacijent_uzorak = uzorak_opcija
+        
         ima_eksterni = st.toggle("Eksterni broj uzorka")
         if ima_eksterni:
-            pacijent_eksterni = st.text_input("", label_visibility="collapsed")
+            pacijent_eksterni = st.text_input("Eksterni:",
+                                              label_visibility="collapsed")
             if not pacijent_eksterni:
                 pacijent_eksterni = "-"
         else:
             pacijent_eksterni = "-"
 
     with col2:
-        pacijent_broj = st.text_input("Broj pacijenta (za izveštaj i uzorak)")
-        pacijent_prijem = st.date_input("Datum prijema uzorka", value=None, format="DD.MM.YYYY", min_value=datetime(1900, 1, 1))
+        pacijent_broj = st.text_input("Broj:", placeholder = "1127")
+        
+        pacijent_prijem = st.date_input("Datum prijema uzorka",
+                                        value=None, format="DD.MM.YYYY",
+                                        min_value=datetime(1900, 1, 1),
+                                        help = "Datum može da se kuca!")
 
     analiza_naziv = analysis_config[analiza_vrsta]["naziv"]
     analiza_sifra = analysis_config[analiza_vrsta]["sifra"]
@@ -83,25 +104,46 @@ with st.container(border=True):
     col3, col4 = st.columns(2)
 
     with col3:
-        pacijent_ime = st.text_input("Ime i prezime pacijenta")
+        pacijent_ime = st.text_input("Ime i prezime pacijenta:",
+                                     placeholder = "Petar Jović")
+        
         pacijent_pol = st.selectbox("Pol", ["ženski", "muški"])
         
     with col4:
-        pacijent_ime_genitiv = st.text_input("Ime i prezime u Genitivu - npr. 'Jelene Jović'")
-        pacijent_datum = st.date_input("Datum rođenja", value=None, format="DD.MM.YYYY", min_value=datetime(1900, 1, 1))
+        pacijent_ime_genitiv = st.text_input("Ime i prezime u Genitivu:",
+                                             placeholder = "Petra Jovića",
+                                             help = "Neophodno za rečenicu 'Kod pacijenta XY...'")
+        
+        col_datum, col_nepoznato = st.columns([5, 3])
+        with col_nepoznato:
+            st.space(size="small")
+            datum_nepoznat = st.toggle("Prenatalna")
+            
+        with col_datum:
+            if datum_nepoznat:
+                st.text_input("Datum rođenja:", "/")
+                pacijent_datum = "/"
+            else:
+                pacijent_datum = st.date_input("Datum rođenja:",
+                                       value=None, format="DD.MM.YYYY",
+                                       min_value=datetime(1900, 1, 1))
 
-    pacijent_dijagnoza = st.text_input("Dijagnoza")
+    pacijent_dijagnoza = st.text_input("Dijagnoza",
+                                       placeholder = "dilatativna kardiomiopatija I42.0")
 
     col5, col6 = st.columns([5, 1])
     with col6:
         st.space(size="small")
-        rucni_unos_hpo = st.toggle("Ručni HPO", help = "Override kada želite da kopirate HPO termine od nekud")
+        rucni_unos_hpo = st.toggle("Ručni HPO",
+                                   help = "Override kada želite da kopirate HPO termine od nekud")
     with col5:
         if not rucni_unos_hpo:
-            HPO_termini = st.multiselect("Odaberite HPO termine:", HPO, placeholder="Type to search")
+            HPO_termini = st.multiselect("Odaberite HPO termine:", HPO,
+                                         placeholder="Type to search")
             HPO = ", ".join(HPO_termini)
         else:
-            HPO = st.text_area("Analizirani HPO termini (npr. Flexion contracture HP:0001371, Multiple joint contractures HP:0002828,)")
+            HPO = st.text_area("Analizirani HPO termini:",
+                               placeholder = "Flexion contracture HP:0001371, Multiple joint contractures HP:0002828")
 
 
 # Block 4
@@ -117,31 +159,43 @@ with st.container(border=True):
             v_col1, v_col2, v_col3 = st.columns(3)
             
             with v_col1:
-                varijanta["gen"] = st.text_input("Gen", key=f"gen_{vid}")
-                varijanta["klasa"] = st.selectbox("Klasa",
+                varijanta["gen"] = st.text_input("Gen:",
+                                                 placeholder = "DMD, HBB, COL3A1",
+                                                 key=f"gen_{vid}")
+                varijanta["klasa"] = st.selectbox("Klasa:",
                                                   ["patogena varijanta (klasa 1)",
                                                    "verovatno patogena varijanta (klasa 2)",
                                                    "varijanta neodređenog značaja (klasa 3)",
                                                    "verovatno benigna varijanta (klasa 4)",
                                                    "benigna varijanta (klasa 5)"],
                                                   key=f"class_{vid}")
-                varijanta["hromozom"] = st.text_input("Hromozom", key=f"chr_{vid}")
+                varijanta["hromozom"] = st.text_input("Hromozom",
+                                                      placeholder = "12",
+                                                      key=f"chr_{vid}")
                 varijanta["gnomadE"] = st.text_input("GnomAD Exomes (%)", value="0.00", key=f"gnE_{vid}")
 
             with v_col2:
-                varijanta["transkript"] = st.text_input("Transkript", key=f"trans_{vid}")
+                varijanta["transkript"] = st.text_input("Transkript:",
+                                                        placeholder = "NM_123123.1",
+                                                        key=f"trans_{vid}")
                 varijanta["zigotnost"] = st.selectbox("Zigotnost",
                                                       ["heterozigot",
                                                        "homozigot",
                                                        "hemizigot"],
                                                        key=f"zig_{vid}")
-                varijanta["egzon"] = st.text_input("Egzon (npr. 4/6)", key=f"ex_{vid}")
+                varijanta["egzon"] = st.text_input("Egzon / intron:",
+                                                   placeholder = "Egzon: 4/6 ili Intron: 3/18",
+                                                   key=f"ex_{vid}")
                 varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)", value="0.00", key=f"gnG_{vid}")
 
             with v_col3:
-                varijanta["HGVS"] = st.text_input("HGVS (npr. c.123A>G)", key=f"hgvs_{vid}")
-                varijanta["tip"] = st.text_input("Tip (npr. Missense)", key=f"tip_{vid}")
-                varijanta["skor"] = st.text_input("MetaRNN skor", key=f"score_{vid}")
+                varijanta["HGVS"] = st.text_input("HGVS:",
+                                                  placeholder = "c.123A>G",
+                                                  key=f"hgvs_{vid}")
+                varijanta["tip"] = st.text_input("Tip:",
+                                                 placeholder = "Missense",
+                                                 key=f"tip_{vid}")
+                varijanta["skor"] = st.text_input("Preditkivni skor", placeholder = "MetaRNN: 0.85 ili CADD: 27 itd.", key=f"score_{vid}")
             
             criteria = st.multiselect(
                 "Izaberite ACMG kriterijume:", 
@@ -279,7 +333,7 @@ with st.container(border=True):
 # Block 6
 with st.container(border=True):
     st.subheader("✍️ Analizator")
-    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi","Niko"], label_visibility="collapsed")
+    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi", "Makica","Niko"], label_visibility="collapsed")
 
 # Report Generation
 

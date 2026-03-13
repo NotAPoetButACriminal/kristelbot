@@ -1,6 +1,6 @@
 analysis_config = {
     "WRFZO": {
-        "naziv": "Sekvenciranje celog egzoma",
+        "naziv": "sekvenciranje celog egzoma",
         "sifra": "039",
         "geni": "svih",
         "panel": "Exome 2.0 (Illumina)",
@@ -9,7 +9,7 @@ analysis_config = {
         
     },
     "pWES": {
-        "naziv": "Sekvenciranje celog egzoma",
+        "naziv": "sekvenciranje celog egzoma",
         "sifra": "040",
         "geni": "svih",
         "panel": "Exome 2.0 (Illumina)",
@@ -18,7 +18,7 @@ analysis_config = {
         
     },
     "RFZO": {
-        "naziv": "Sekvenciranje kliničkog egzoma",
+        "naziv": "sekvenciranje kliničkog egzoma",
         "sifra": "037",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",
@@ -27,7 +27,7 @@ analysis_config = {
         
     },
     "SOVO": {
-        "naziv": "Sekvenciranje kliničkog egzoma",
+        "naziv": "sekvenciranje kliničkog egzoma",
         "sifra": "037-SOVO",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",
@@ -35,7 +35,7 @@ analysis_config = {
         "instrument": "NextSeq 550 (Illumina)"
     },
     "NGS": {
-        "naziv": "Sekvenciranje kliničkog egzoma",
+        "naziv": "sekvenciranje kliničkog egzoma",
         "sifra": "018",
         "geni": "4813 klinički relevantnih",
         "panel": "TruSight One (Illumina)",

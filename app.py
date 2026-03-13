@@ -11,6 +11,9 @@ from analysis_config import analysis_config
 if "varijante" not in st.session_state:
     st.session_state.varijante = []
 
+if "cnvovi" not in st.session_state:
+    st.session_state.cnvovi = []
+
 if "literatura" not in st.session_state:
     st.session_state.literatura = [
         {
@@ -106,8 +109,9 @@ with st.container(border=True):
     st.subheader("🧬 Rezultat")
     rezultat_rezultat = st.selectbox("Rezultat", ["NEGATIVAN", "POZITIVAN", "NEODREĐEN"])
 
+    ### SNV ###
     for i, varijanta in enumerate(st.session_state.varijante):
-        vid = varijanta.setdefault("id", str(uuid.uuid4()))
+        vid = varijanta.setdefault("vid", str(uuid.uuid4()))
 
         with st.expander(f"Varijanta {i+1}:", expanded=True):
             v_col1, v_col2, v_col3 = st.columns(3)
@@ -161,19 +165,83 @@ with st.container(border=True):
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
                                                "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
-            treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju")
+            treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju", key=f"tobr_{vid}")
             if treba_obrazlozenje:
                 varijanta["obrazlozenje"] = st.text_area("obrazlozenje",
                                                          label_visibility="collapsed",
                                                          height = "content",
+                                                         key=f"obr_{vid}",
                                                          value = "Ovaj redak genetički poremećaj se karakteriše multiplim kongenitalnim anomalijama, facijalnom dismorfijom, varijabilnim intelektualnim oštećenjem, usporenim psihomotornim razvojem, epileptičnim napadima, hipertrihozom i hiperplazijom gingiva.")
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
                 st.rerun()
-
+    
     if st.button("➕ Dodaj novu varijantu"):
-        st.session_state.varijante.append({"id": str(uuid.uuid4())})
+        st.session_state.varijante.append({"vid": str(uuid.uuid4())})
+        st.rerun()
+    
+    ### CNV ###
+    for i, cnv in enumerate(st.session_state.cnvovi):
+        cid = cnv.setdefault("cid", str(uuid.uuid4()))
+
+        with st.expander(f"CNV {i+1}:", expanded=True):
+            c_col1, c_col2, c_col3 = st.columns(3)
+            with c_col1:
+                cnv["tip"] = st.selectbox("Tip:",
+                                          ["delecija","duplikacija"],
+                                          key=f"tip_{cid}")
+                if cnv["tip"] == "delecija":
+                    cnv["tip_mnozina"] = "delecije"
+                else:
+                    cnv["tip_mnozina"] = "duplikacije"
+            with c_col2:
+                cnv["klasa"] = st.selectbox("Klasa",
+                                            ["patogena",
+                                             "verovatno patogena",
+                                             "neodređenog značaja",
+                                             "verovatno benigna",
+                                             "benigna"],
+                                            key=f"class_{cid}")
+            with c_col3:
+                cnv["region"] = st.text_input("Region:",
+                                              placeholder = "22q13.33",
+                                              key=f"region_{cid}")
+            c_col4, c_col5 = st.columns([2,1])
+            with c_col4:
+                cnv["opis"] = st.text_input("Koordinate:",
+                                            placeholder = "GRCh38 Chr22: 50684335 - 50780969",
+                                            key = f"opis_{cid}")
+            with c_col5:
+                cnv["duzina"] = st.text_input("Dužina:",
+                                            placeholder = "96.6 kb",
+                                            key = f"duzina_{cid}")
+            cnv["geni"] = st.text_input("CNV Obuhvata:",
+                                              placeholder = "11 gena; DMD gen; 31 gen uključujući i HBB; od 11. do 23. egzona DMD gena itd.",
+                                              key=f"geni_{cid}")
+            cnv["bolest"] = st.text_input("Patogene CNV u genu asocirane su sa:",
+                                          placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
+                                          key=f"dis_{cid}")
+            cnv["model"] = st.selectbox("Model nasleđivanja",
+                                        ["autozomno dominantno",
+                                         "autozomno recesivno",
+                                         "autozomno dominantno ili autozomno recesivno"],
+                                        key=f"mod_{cid}")
+            cnv_treba_obrazlozenje = st.toggle("Obrazloženje:",
+                                               help = "Ova rečenica ide u interpretaciju",
+                                               key=f"tobr_{cid}")
+            if cnv_treba_obrazlozenje:
+                cnv["obrazlozenje"] = st.text_area("obrazlozenje",
+                                                         label_visibility="collapsed",
+                                                         height = "content",
+                                                         key=f"obr_{cid}",
+                                                         value = "Klinička ekspresivnost sindroma je veoma varijabilna, sa rasponom od potpuno asimptomatskih nosilaca do osoba sa izraženijim razvojnim i neurološkim poremećajima. Najčešće prijavljene manifestacije uključuju kašnjenje u govoru, blagu do umerenu intelektualnu ometenost, autizam, epileptičke napade i poremećaje motorike, uključujući i slučajeve cerebralne paralize.")
+            if st.button(f"🗑️ Ukloni CNV {i+1}", key=f"remove_{cid}"):
+                st.session_state.cnvovi.pop(i)
+                st.rerun()
+
+    if st.button("➕ Dodaj novu CNV"):
+        st.session_state.cnvovi.append({"cid": str(uuid.uuid4())})
         st.rerun()
 
     segregaciona = st.toggle("Neophodna segregaciona analiza")
@@ -190,7 +258,7 @@ with st.container(border=True):
     st.subheader("📚 Literatura")
 
     for i, ref in enumerate(st.session_state.literatura):
-        lid = ref.setdefault("id", str(uuid.uuid4()))
+        lid = ref.setdefault("lid", str(uuid.uuid4()))
 
         l_col1, l_col2 = st.columns([9, 1]) 
         
@@ -205,7 +273,7 @@ with st.container(border=True):
                 st.rerun()
 
     if st.button("➕ Dodaj referencu"):
-        st.session_state.literatura.append({"id": str(uuid.uuid4())})
+        st.session_state.literatura.append({"lid": str(uuid.uuid4())})
         st.rerun()
 
 # Block 6
@@ -229,7 +297,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
     if uzorak_opcija == "Drugo" and not pacijent_uzorak:
         missing_fields.append("Unesite tip uzorka (označili ste opciju 'Drugo')")
     if not HPO: missing_fields.append("HPO termini")
-    if rezultat_rezultat in ["POZITIVAN", "NEODREĐEN"] and len(st.session_state.varijante) == 0:
+    if rezultat_rezultat in ["POZITIVAN", "NEODREĐEN"] and len(st.session_state.varijante) == 0 and len(st.session_state.cnvovi) == 0:
         missing_fields.append("Barem jedna varijanta (jer je rezultat POZITIVAN ili NEODREĐEN)")
     # Check every field inside every added variant
     for i, var in enumerate(st.session_state.varijante):
@@ -277,6 +345,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "segregaciona": segregaciona,
                 "pacijent_ime_genitiv": pacijent_ime_genitiv,
                 "varijante": st.session_state.varijante,
+                "cnvovi": st.session_state.cnvovi,
                 "treba_napomena": treba_napomena,
                 "napomena" : napomena,
                 "analizator": analizator,

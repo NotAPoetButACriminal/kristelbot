@@ -61,8 +61,8 @@ with st.container(border=True):
                           min_value=datetime(1900, 1, 1))
     
     ustanova = ustanova_opcija = st.selectbox("Ustanova:",
-                                              ["Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
-                                               "Univerzitetska dečja klinika",
+                                              ["Univerzitetska dečja klinika",
+                                               "Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
                                                "UKCS - Klinika za ginekologiju i akušerstvo",
                                                "UKCS - Klinika za neurologiju",
                                                "UKCS - Klinika za nefrologiju",
@@ -77,6 +77,7 @@ with st.container(border=True):
         ustanova = ustanova_opcija
     
     lekari = st.text_input("Lekari:",
+                           "dr Goran Čuturilo, dr Jelena Ruml Stojanović, dr Brankica Bosankić, dr Marija Mijović",
                            placeholder = "dr Slavica Ostojić, dr Jovana Beđik, dr Jelena Kojović")
 
 # Block 2

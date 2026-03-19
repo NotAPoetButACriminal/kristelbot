@@ -150,6 +150,10 @@ with st.container(border=True):
                 pacijent_datum = st.date_input("Datum rođenja:",
                                        value=None, format="DD.MM.YYYY",
                                        min_value=datetime(1900, 1, 1))
+            if pacijent_datum in ["/", None, ""]:
+                formatiran_datum = "/"
+            else:
+                formatiran_datum = pacijent_datum.strftime("%d.%m.%Y.")
 
     pacijent_dijagnoza = st.text_input("Dijagnoza",
                                        placeholder = "dilatativna kardiomiopatija I42.0")
@@ -475,7 +479,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "pacijent_prijem": pacijent_prijem.strftime("%d.%m.%Y."),
                 "pacijent_uzorak": pacijent_uzorak,
                 "pacijent_ime": pacijent_ime,
-                "pacijent_datum": pacijent_datum.strftime("%d.%m.%Y."),
+                "pacijent_datum": formatiran_datum,
                 "pacijent_pol": pacijent_pol,
                 "pacijent_dijagnoza": pacijent_dijagnoza,
                 "analiza_geni": analiza_geni,

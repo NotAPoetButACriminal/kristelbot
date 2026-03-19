@@ -2,6 +2,8 @@ import streamlit as st
 from docxtpl import DocxTemplate
 import io
 import uuid
+import json
+import os
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from HPO import HPO
@@ -22,10 +24,31 @@ if "literatura" not in st.session_state:
         },
         {
             "id": str(uuid.uuid4()),
+            "tekst": "Online Mendelian Inheritance in Man, OMIM®, world wide web url: http://omim.org/,” McKusick-Nathans Institute of Genetic Medicine, Johns Hopkins University (Baltimore, MD)"
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "tekst": "https://www.orpha.net"
+        },
+        {
+            "id": str(uuid.uuid4()),
             "tekst": "https://varsome.com"
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "tekst": "https://hpo.jax.org"
         }
     ]
 
+if "obrazlozenja" not in st.session_state:
+    obrazlozenja_json = "obrazlozenja.json"
+    if not os.path.exists(obrazlozenja_json):
+        with open(obrazlozenja_json, "w", encoding="utf-8") as f:
+            json.dump({}, f)
+    with open(obrazlozenja_json, "r", encoding="utf-8") as f:
+        st.session_state.obrazlozenja = json.load(f)
+
+# Title
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
 st.title("RFZO Genetički Izveštaj")
 
@@ -172,7 +195,9 @@ with st.container(border=True):
                 varijanta["hromozom"] = st.text_input("Hromozom",
                                                       placeholder = "12",
                                                       key=f"chr_{vid}")
-                varijanta["gnomadE"] = st.text_input("GnomAD Exomes (%)", value="0.00", key=f"gnE_{vid}")
+                varijanta["gnomadE"] = st.text_input("GnomAD Exomes (%)",
+                                                     value="0.00",
+                                                     key=f"gnE_{vid}")
 
             with v_col2:
                 varijanta["transkript"] = st.text_input("Transkript:",
@@ -186,7 +211,9 @@ with st.container(border=True):
                 varijanta["egzon"] = st.text_input("Egzon / intron:",
                                                    placeholder = "Egzon: 4/6 ili Intron: 3/18",
                                                    key=f"ex_{vid}")
-                varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)", value="0.00", key=f"gnG_{vid}")
+                varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)",
+                                                     value="0.00",
+                                                     key=f"gnG_{vid}")
 
             with v_col3:
                 varijanta["HGVS"] = st.text_input("HGVS:",
@@ -195,7 +222,9 @@ with st.container(border=True):
                 varijanta["tip"] = st.text_input("Tip:",
                                                  placeholder = "Missense",
                                                  key=f"tip_{vid}")
-                varijanta["skor"] = st.text_input("Preditkivni skor", placeholder = "MetaRNN: 0.85 ili CADD: 27 itd.", key=f"score_{vid}")
+                varijanta["skor"] = st.text_input("Preditkivni skor",
+                                                  placeholder = "MetaRNN: 0.85 ili CADD: 27 itd.",
+                                                  key=f"score_{vid}")
             
             criteria = st.multiselect(
                 "Izaberite ACMG kriterijume:", 
@@ -203,7 +232,6 @@ with st.container(border=True):
                 placeholder="Type to search",
                 key=f"ms_{vid}"
             )
-
             sentences = []
             for criterium in criteria:
                 varijanta[f"sentence_{criterium}"] = st.text_area(f"{criterium}",
@@ -214,18 +242,57 @@ with st.container(border=True):
             
             varijanta["acmg_oznake"] = ", ".join(criteria)
             varijanta["acmg_tekst"] = " ".join(sentences)
-            varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa: npr. 'urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)'", key=f"dis_{vid}")
+            
+            # varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa:",
+            #                                     placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
+            #                                     key=f"dis_{vid}")
+            varijanta["bolest"] = st.selectbox("Patogene varijante u genu asocirane su sa:",
+                                                options = list(st.session_state.obrazlozenja.keys()),
+                                                accept_new_options = True,
+                                                help = "Izaberite ili iskucajte novu i kliknite Add: (ili Enter)",
+                                                key = f"dis_{vid}")
+            
             varijanta["model"] = st.selectbox("Model nasleđivanja",
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
-                                               "autozomno dominantno ili autozomno recesivno"], key=f"mod_{vid}")
-            treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju", key=f"tobr_{vid}")
-            if treba_obrazlozenje:
-                varijanta["obrazlozenje"] = st.text_area("obrazlozenje",
-                                                         label_visibility="collapsed",
-                                                         height = "content",
-                                                         key=f"obr_{vid}",
-                                                         value = "Ovaj redak genetički poremećaj se karakteriše multiplim kongenitalnim anomalijama, facijalnom dismorfijom, varijabilnim intelektualnim oštećenjem, usporenim psihomotornim razvojem, epileptičnim napadima, hipertrihozom i hiperplazijom gingiva.")
+                                               "autozomno dominantno ili autozomno recesivno"],
+                                              key=f"mod_{vid}")
+            
+            varijanta["obrazlozenje"] = st.text_area("Obrazloženje:",
+                                                     placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana kada sledeći put odaberete istu bolest.",
+                                                     height = "content",
+                                                     help = "Svaka bolest koja je uneta prvi put biće zapamćena zajedno sa obrazloženjem tako da sledeći put možete da je odaberete",
+                                                     key=f"obr_{vid}_{varijanta["bolest"]}",
+                                                     value=st.session_state.obrazlozenja.get(varijanta["bolest"], ""))
+            
+            
+            # treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju", key=f"tobr_{vid}")
+            # if treba_obrazlozenje:
+            #     ime_obrazlozenja = st.selectbox("Učitaj prethodno obrazloženje:",
+            #                                     options = list(st.session_state.obrazlozenja.keys()),
+            #                                     placeholder = "",
+            #                                     accept_new_options = True,
+            #                                     key = f"imebolesti_{vid}")
+            #     varijanta["obrazlozenje"] = st.text_area("obrazlozenje",
+            #                                              label_visibility="collapsed",
+            #                                              placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana za sledeći put",
+            #                                              height = "content",
+            #                                              key=f"obr_{vid}_{ime_obrazlozenja}",
+            #                                              value=st.session_state.obrazlozenja.get(ime_obrazlozenja, ""))
+            #     col_ime, col_dugme = st.columns([2, 1])
+            #     with col_ime:
+            #         novo_ime = st.text_input("Sačuvaj novo obrazloženje pod imenom:",
+            #                                  placeholder = "Kardiomiopatija")
+            #     with col_dugme:
+            #         st.space(size = "small")
+            #         if st.button("Sačuvaj obrazloženje"):
+            #             if novo_ime and varijanta["obrazlozenje"]:
+            #                 st.session_state.obrazlozenja[novo_ime] = varijanta["obrazlozenje"]
+            #                 with open("obrazlozenja.json", "w", encoding="utf-8") as f:
+            #                     json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
+            #                 st.success(f"Šablon '{novo_ime}' je uspešno sačuvan!")
+            #             else:
+            #                 st.warning("Morate uneti i ime bolesti i tekst obrazloženja.")
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
@@ -273,23 +340,42 @@ with st.container(border=True):
             cnv["geni"] = st.text_input("CNV Obuhvata:",
                                               placeholder = "11 gena; DMD gen; 31 gen uključujući i HBB; od 11. do 23. egzona DMD gena itd.",
                                               key=f"geni_{cid}")
-            cnv["bolest"] = st.text_input("Patogene CNV u genu asocirane su sa:",
-                                          placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
-                                          key=f"dis_{cid}")
+            
+            cnv["bolest"] = st.selectbox("Patogene varijante u genu asocirane su sa:",
+                                                options = list(st.session_state.obrazlozenja.keys()),
+                                                accept_new_options = True,
+                                                help = "Izaberite ili iskucajte novu i kliknite Add: (ili Enter)",
+                                                key = f"dis_{cid}")
+            
             cnv["model"] = st.selectbox("Model nasleđivanja",
-                                        ["autozomno dominantno",
-                                         "autozomno recesivno",
-                                         "autozomno dominantno ili autozomno recesivno"],
-                                        key=f"mod_{cid}")
-            cnv_treba_obrazlozenje = st.toggle("Obrazloženje:",
-                                               help = "Ova rečenica ide u interpretaciju",
-                                               key=f"tobr_{cid}")
-            if cnv_treba_obrazlozenje:
-                cnv["obrazlozenje"] = st.text_area("obrazlozenje",
-                                                         label_visibility="collapsed",
-                                                         height = "content",
-                                                         key=f"obr_{cid}",
-                                                         value = "Klinička ekspresivnost sindroma je veoma varijabilna, sa rasponom od potpuno asimptomatskih nosilaca do osoba sa izraženijim razvojnim i neurološkim poremećajima. Najčešće prijavljene manifestacije uključuju kašnjenje u govoru, blagu do umerenu intelektualnu ometenost, autizam, epileptičke napade i poremećaje motorike, uključujući i slučajeve cerebralne paralize.")
+                                              ["autozomno dominantno",
+                                               "autozomno recesivno",
+                                               "autozomno dominantno ili autozomno recesivno"],
+                                              key=f"mod_{cid}")
+            
+            cnv["obrazlozenje"] = st.text_area("Obrazloženje:",
+                                                     placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana kada sledeći put odaberete istu bolest.",
+                                                     height = "content",
+                                                     help = "Svaka bolest koja je uneta prvi put biće zapamćena zajedno sa obrazloženjem tako da sledeći put možete da je odaberete",
+                                                     key=f"obr_{cid}_{cnv["bolest"]}",
+                                                     value=st.session_state.obrazlozenja.get(cnv["bolest"], ""))
+            # cnv["bolest"] = st.text_input("Patogene CNV u genu asocirane su sa:",
+            #                               placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
+            #                               key=f"dis_{cid}")
+            # cnv["model"] = st.selectbox("Model nasleđivanja",
+            #                             ["autozomno dominantno",
+            #                              "autozomno recesivno",
+            #                              "autozomno dominantno ili autozomno recesivno"],
+            #                             key=f"mod_{cid}")
+            # cnv_treba_obrazlozenje = st.toggle("Obrazloženje:",
+            #                                    help = "Ova rečenica ide u interpretaciju",
+            #                                    key=f"tobr_{cid}")
+            # if cnv_treba_obrazlozenje:
+            #     cnv["obrazlozenje"] = st.text_area("obrazlozenje",
+            #                                              label_visibility="collapsed",
+            #                                              height = "content",
+            #                                              key=f"obr_{cid}",
+            #                                              value = "Klinička ekspresivnost sindroma je veoma varijabilna, sa rasponom od potpuno asimptomatskih nosilaca do osoba sa izraženijim razvojnim i neurološkim poremećajima. Najčešće prijavljene manifestacije uključuju kašnjenje u govoru, blagu do umerenu intelektualnu ometenost, autizam, epileptičke napade i poremećaje motorike, uključujući i slučajeve cerebralne paralize.")
             if st.button(f"🗑️ Ukloni CNV {i+1}", key=f"remove_{cid}"):
                 st.session_state.cnvovi.pop(i)
                 st.rerun()
@@ -299,7 +385,8 @@ with st.container(border=True):
         st.rerun()
 
     segregaciona = st.toggle("Neophodna segregaciona analiza")
-    treba_napomena = st.toggle("Napomena:", help = "Preporučivanje segregacione analize ne ide u napomenu već ima poseban toggle")
+    treba_napomena = st.toggle("Napomena:",
+                               help = "Preporučivanje segregacione analize ne ide u napomenu već ima poseban toggle")
     napomena = ""
     if treba_napomena:
             napomena = st.text_area("napomena",
@@ -419,6 +506,19 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 file_name=f"Izveštaj {analiza_kod} I-01-{analiza_sifra}-{pacijent_broj}_{pacijent_ime}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
+
+            for i, varijanta in enumerate(st.session_state.varijante):
+                if varijanta["bolest"] and varijanta["obrazlozenje"] and st.session_state.obrazlozenja.get(varijanta["bolest"]) != varijanta["obrazlozenje"]:
+                    st.session_state.obrazlozenja[varijanta["bolest"]] = varijanta["obrazlozenje"]
+                    with open("obrazlozenja.json", "w", encoding="utf-8") as f:
+                        json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
+
+            for i, cnv in enumerate(st.session_state.cnvovi):
+                if cnv["bolest"] and cnv["obrazlozenje"] and st.session_state.obrazlozenja.get(cnv["bolest"]) != cnv["obrazlozenje"]:
+                    st.session_state.obrazlozenja[cnv["bolest"]] = cnv["obrazlozenje"]
+                    with open("obrazlozenja.json", "w", encoding="utf-8") as f:
+                        json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
+
         except Exception as e:
             st.error(f"Došlo je do greške: {e}")
 

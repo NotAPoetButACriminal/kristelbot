@@ -214,6 +214,7 @@ with st.container(border=True):
                                                        "hemizigot"],
                                                        key=f"zig_{vid}")
                 varijanta["egzon"] = st.text_input("Egzon / intron:",
+                                                   "Egzon: ",
                                                    placeholder = "Egzon: 4/6 ili Intron: 3/18",
                                                    key=f"ex_{vid}")
                 varijanta["gnomadG"] = st.text_input("GnomAD Genomes (%)",
@@ -228,6 +229,7 @@ with st.container(border=True):
                                                  placeholder = "Missense",
                                                  key=f"tip_{vid}")
                 varijanta["skor"] = st.text_input("Preditkivni skor",
+                                                  "MetaRNN: ",
                                                   placeholder = "MetaRNN: 0.85 ili CADD: 27 itd.",
                                                   key=f"score_{vid}")
             
@@ -260,7 +262,9 @@ with st.container(border=True):
             varijanta["model"] = st.selectbox("Model nasleđivanja",
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
-                                               "autozomno dominantno ili autozomno recesivno"],
+                                               "autozomno dominantno ili autozomno recesivno",
+                                               "X-vezano recesivno",
+                                               "X-vezano dominantno"],
                                               key=f"mod_{vid}")
             
             varijanta["obrazlozenje"] = st.text_area("Obrazloženje:",

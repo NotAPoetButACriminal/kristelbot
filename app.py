@@ -1,12 +1,12 @@
 import streamlit as st
 from docxtpl import DocxTemplate
 #import streamlit_authenticator as stauth
-import yaml
+#import yaml
 import io
 import uuid
 import json
 import os
-from yaml.loader import SafeLoader
+#from yaml.loader import SafeLoader
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from HPO import HPO

@@ -1,13 +1,40 @@
 import streamlit as st
 from docxtpl import DocxTemplate
+import streamlit_authenticator as stauth
+import yaml
 import io
 import uuid
 import json
 import os
+from yaml.loader import SafeLoader
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from HPO import HPO
 from analysis_config import analysis_config
+
+# Stauth
+
+# with open('stauth.yaml') as file:
+#     config = yaml.load(file, Loader=SafeLoader)
+
+# authenticator = stauth.Authenticate(
+#     config['credentials'],
+#     config['cookie']['name'],
+#     config['cookie']['key'],
+#     config['cookie']['expiry_days']
+# )
+
+# authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
+#                               'Username':'Email',
+#                               'Password':'Password',
+#                               'Login':'Login',
+#                               'Captcha':'Captcha'})
+
+# if st.session_state.get('authentication_status') is False:
+#     st.error('Pogrešno korisničko ime ili lozinka.')
+#     st.stop()
+# elif st.session_state.get('authentication_status') is None:
+#     st.stop()
 
 # Initialize
 if "varijante" not in st.session_state:
@@ -429,7 +456,12 @@ with st.container(border=True):
 # Block 6
 with st.container(border=True):
     st.subheader("✍️ Analizator")
-    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi", "Makica","Niko"], label_visibility="collapsed")
+    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi", "Makica", "Đole", "Marina","Niko"], label_visibility="collapsed")
+
+# with st.container(border=True):
+#     st.subheader("✍️ Analizator")
+#     analizator = st.text_input("analizator", value = st.session_state.get('name'), label_visibility="collapsed")
+#     authenticator.logout('Odjavi se', 'main')
 
 # Report Generation
 

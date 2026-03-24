@@ -1,6 +1,6 @@
 import streamlit as st
 from docxtpl import DocxTemplate
-import streamlit_authenticator as stauth
+#import streamlit_authenticator as stauth
 import yaml
 import io
 import uuid

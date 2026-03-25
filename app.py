@@ -502,13 +502,13 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
             for i, varijanta in enumerate(st.session_state.varijante):
                 if varijanta["bolest"] and varijanta["obrazlozenje"] and st.session_state.obrazlozenja.get(varijanta["bolest"]) != varijanta["obrazlozenje"]:
                     st.session_state.obrazlozenja[varijanta["bolest"]] = varijanta["obrazlozenje"]
-                    with open("obrazlozenja.json", "w", encoding="utf-8") as f:
+                    with open(obrazlozenja_json, "w", encoding="utf-8") as f:
                         json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
 
             for i, cnv in enumerate(st.session_state.cnvovi):
                 if cnv["bolest"] and cnv["obrazlozenje"] and st.session_state.obrazlozenja.get(cnv["bolest"]) != cnv["obrazlozenje"]:
                     st.session_state.obrazlozenja[cnv["bolest"]] = cnv["obrazlozenje"]
-                    with open("obrazlozenja.json", "w", encoding="utf-8") as f:
+                    with open(obrazlozenja_json, "w", encoding="utf-8") as f:
                         json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
 
         except Exception as e:

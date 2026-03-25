@@ -69,8 +69,8 @@ if "literatura" not in st.session_state:
         }
     ]
 
+obrazlozenja_json = "/data/obrazlozenja.json"
 if "obrazlozenja" not in st.session_state:
-    obrazlozenja_json = "/data/obrazlozenja.json"
     if not os.path.exists(obrazlozenja_json):
         with open(obrazlozenja_json, "w", encoding="utf-8") as f:
             json.dump({}, f)

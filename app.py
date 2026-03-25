@@ -1,6 +1,6 @@
 import streamlit as st
 from docxtpl import DocxTemplate
-import streamlit_authenticator as stauth
+#import streamlit_authenticator as stauth
 import yaml
 import io
 import uuid
@@ -14,28 +14,46 @@ from analysis_config import analysis_config
 
 ### Login ###
 
-if "auth_config" not in st.session_state:
-    with open('/etc/secrets/stauth.yaml', 'r', encoding='utf-8') as file:
-        st.session_state["auth_config"] = yaml.load(file, Loader=SafeLoader)
+# if "auth_config" not in st.session_state:
+#     with open('/etc/secrets/stauth.yaml', 'r', encoding='utf-8') as file:
+#         st.session_state["auth_config"] = yaml.load(file, Loader=SafeLoader)
 
-authenticator = stauth.Authenticate(
-    st.session_state["auth_config"]['credentials'],
-    st.session_state["auth_config"]['cookie']['name'],
-    st.session_state["auth_config"]['cookie']['key'],
-    st.session_state["auth_config"]['cookie']['expiry_days']
-)
+# authenticator = stauth.Authenticate(
+#     st.session_state["auth_config"]['credentials'],
+#     st.session_state["auth_config"]['cookie']['name'],
+#     st.session_state["auth_config"]['cookie']['key'],
+#     st.session_state["auth_config"]['cookie']['expiry_days']
+# )
 
-authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
-                              'Username':'Email',
-                              'Password':'Password',
-                              'Login':'Login',
-                              'Captcha':'Captcha'})
+# authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
+#                               'Username':'Email',
+#                               'Password':'Password',
+#                               'Login':'Login',
+#                               'Captcha':'Captcha'})
 
-if st.session_state.get('authentication_status') is False:
-    st.error('Pogrešno korisničko ime ili lozinka.')
-    st.stop()
-elif st.session_state.get('authentication_status') is None:
-    st.stop()
+# if st.session_state.get('authentication_status') is False:
+#     st.error('Pogrešno korisničko ime ili lozinka.')
+#     st.stop()
+# elif st.session_state.get('authentication_status') is None:
+#     st.stop()
+
+if not st.session_state.get("loggedin", False):
+    st.title("RFZO Izveštaj Generator")
+    with st.form("login"):
+        username = st.text_input("Email:")
+        password = st.text_input("Password:", type="password")
+        login = st.form_submit_button("Log in", use_container_width=True)
+        if login:
+            users = st.secrets["email"]
+            if username in st.secrets["email"] and st.secrets["email"][username]["password"] == password:
+                st.session_state["loggedin"] = True
+                st.session_state["username"] = username
+                st.session_state["puno_ime"] = st.secrets["email"][username]["puno_ime"]
+                st.rerun()
+            else:
+                st.error("Wrong username or password")
+        st.stop()
+
 
 ### Initialize ###
 
@@ -409,10 +427,12 @@ with st.container(border=True):
 with st.container(border=True):
     st.subheader("✍️ Analizator")
     analizator = st.text_input("analizator",
-                               value = st.session_state.get('name'),
+                               value = st.session_state["puno_ime"],
                                label_visibility="collapsed",
                                disabled = True)
-    authenticator.logout('Odjavi se', 'main')
+    if st.button("Log out", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
 
 # Report Generation
 
@@ -481,7 +501,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
                 "cnvovi": st.session_state.cnvovi,
                 "treba_napomena": treba_napomena,
                 "napomena" : napomena,
-                "analizator": analizator,
+                "analizator": st.session_state["puno_ime"],
                 "literatura": st.session_state.literatura,
                 "analiza_instrument": analiza_instrument
             }

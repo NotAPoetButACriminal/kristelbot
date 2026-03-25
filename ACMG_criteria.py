@@ -34,7 +34,7 @@ ACMG_criteria = {
     "PP3_Moderate" : "Za ovu varijantu postoje dokazi iz kompjuterskih predikcija koji idu u prilog njenoj patogenosti (PP3_Moderate).",
     "PP3_Supporting" : "Za ovu varijantu postoje dokazi iz kompjuterskih predikcija koji idu u prilog njenoj patogenosti (PP3_Supporting).",
     "PP4_Supporiting" : "Fenotip pacijenta je retka kombinacija kliničkih karakteristika za koje postoji ograničen broj genetičkih etiologija (PP4_Supporiting).",
-    "PP5_Very Strong" : "Varijanta je prethodno prijavljena kao patogena (PP5_Very Strong). [broj citata]",
+    "PP5_Very Strong" : "ClinVar baza klasifikuje ovu varijantu kao patogenu, citirajući 10 naučnih publikacija, koje ovu varijantu asociraju sa bolešću (PP5_Very Strong). [broj citata]",
     "PP5_Strong" : "Varijanta je prethodno prijavljena kao patogena (PP5_Strong). [broj citata]",
     "PP5_Moderate" : "Varijanta je prethodno prijavljena kao patogena (PP5_Very Strong). [broj citata]",
     "PP5_Supporting" : "Varijanta je prethodno prijavljena kao patogena (PP5_Supporting). [broj citata]",

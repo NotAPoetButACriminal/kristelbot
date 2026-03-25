@@ -1,42 +1,44 @@
 import streamlit as st
 from docxtpl import DocxTemplate
-#import streamlit_authenticator as stauth
-#import yaml
+import streamlit_authenticator as stauth
+import yaml
 import io
 import uuid
 import json
 import os
-#from yaml.loader import SafeLoader
+from yaml.loader import SafeLoader
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from HPO import HPO
 from analysis_config import analysis_config
 
-# Stauth
+### Login ###
 
-# with open('stauth.yaml') as file:
-#     config = yaml.load(file, Loader=SafeLoader)
+if "auth_config" not in st.session_state:
+    with open('/etc/secrets/stauth.yaml', 'r', encoding='utf-8') as file:
+        st.session_state["auth_config"] = yaml.load(file, Loader=SafeLoader)
 
-# authenticator = stauth.Authenticate(
-#     config['credentials'],
-#     config['cookie']['name'],
-#     config['cookie']['key'],
-#     config['cookie']['expiry_days']
-# )
+authenticator = stauth.Authenticate(
+    st.session_state["auth_config"]['credentials'],
+    st.session_state["auth_config"]['cookie']['name'],
+    st.session_state["auth_config"]['cookie']['key'],
+    st.session_state["auth_config"]['cookie']['expiry_days']
+)
 
-# authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
-#                               'Username':'Email',
-#                               'Password':'Password',
-#                               'Login':'Login',
-#                               'Captcha':'Captcha'})
+authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
+                              'Username':'Email',
+                              'Password':'Password',
+                              'Login':'Login',
+                              'Captcha':'Captcha'})
 
-# if st.session_state.get('authentication_status') is False:
-#     st.error('Pogrešno korisničko ime ili lozinka.')
-#     st.stop()
-# elif st.session_state.get('authentication_status') is None:
-#     st.stop()
+if st.session_state.get('authentication_status') is False:
+    st.error('Pogrešno korisničko ime ili lozinka.')
+    st.stop()
+elif st.session_state.get('authentication_status') is None:
+    st.stop()
 
-# Initialize
+### Initialize ###
+
 if "varijante" not in st.session_state:
     st.session_state.varijante = []
 
@@ -68,14 +70,14 @@ if "literatura" not in st.session_state:
     ]
 
 if "obrazlozenja" not in st.session_state:
-    obrazlozenja_json = "obrazlozenja.json"
+    obrazlozenja_json = "/data/obrazlozenja.json"
     if not os.path.exists(obrazlozenja_json):
         with open(obrazlozenja_json, "w", encoding="utf-8") as f:
             json.dump({}, f)
     with open(obrazlozenja_json, "r", encoding="utf-8") as f:
         st.session_state.obrazlozenja = json.load(f)
 
-# Title
+### Title ###
 st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
 st.title("RFZO Genetički Izveštaj")
 
@@ -94,10 +96,11 @@ with st.container(border=True):
                                                "UKCS - Klinika za neurologiju",
                                                "UKCS - Klinika za nefrologiju",
                                                "UKCS - Klinika za kardiologiju",
+                                               "UKCS - Očna klinika",
                                                "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
                                                "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
-                                               "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",
-                                               "drugo"])
+                                               "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",],
+                                               accept_new_options = True)
     if ustanova_opcija == "drugo":
         ustanova = st.text_input("Druga ustanova")
     else:
@@ -273,19 +276,14 @@ with st.container(border=True):
                                                                   key=f"{criterium}_{vid}"
                 )
                 sentences.append(varijanta[f"sentence_{criterium}"])
-            
             varijanta["acmg_oznake"] = ", ".join(criteria)
             varijanta["acmg_tekst"] = " ".join(sentences)
             
-            # varijanta["bolest"] = st.text_input("Patogene varijante u genu asocirane su sa:",
-            #                                     placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
-            #                                     key=f"dis_{vid}")
             varijanta["bolest"] = st.selectbox("Patogene varijante u genu asocirane su sa:",
                                                 options = list(st.session_state.obrazlozenja.keys()),
                                                 accept_new_options = True,
                                                 help = "Izaberite ili iskucajte novu i kliknite Add: (ili Enter)",
                                                 key = f"dis_{vid}")
-            
             varijanta["model"] = st.selectbox("Model nasleđivanja",
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
@@ -293,42 +291,12 @@ with st.container(border=True):
                                                "X-vezano recesivno",
                                                "X-vezano dominantno"],
                                               key=f"mod_{vid}")
-            
             varijanta["obrazlozenje"] = st.text_area("Obrazloženje:",
                                                      placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana kada sledeći put odaberete istu bolest.",
                                                      height = "content",
                                                      help = "Svaka bolest koja je uneta prvi put biće zapamćena zajedno sa obrazloženjem tako da sledeći put možete da je odaberete",
                                                      key=f"obr_{vid}_{varijanta["bolest"]}",
                                                      value=st.session_state.obrazlozenja.get(varijanta["bolest"], ""))
-            
-            
-            # treba_obrazlozenje = st.toggle("Obrazloženje:", help = "Ova rečenica ide u interpretaciju", key=f"tobr_{vid}")
-            # if treba_obrazlozenje:
-            #     ime_obrazlozenja = st.selectbox("Učitaj prethodno obrazloženje:",
-            #                                     options = list(st.session_state.obrazlozenja.keys()),
-            #                                     placeholder = "",
-            #                                     accept_new_options = True,
-            #                                     key = f"imebolesti_{vid}")
-            #     varijanta["obrazlozenje"] = st.text_area("obrazlozenje",
-            #                                              label_visibility="collapsed",
-            #                                              placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana za sledeći put",
-            #                                              height = "content",
-            #                                              key=f"obr_{vid}_{ime_obrazlozenja}",
-            #                                              value=st.session_state.obrazlozenja.get(ime_obrazlozenja, ""))
-            #     col_ime, col_dugme = st.columns([2, 1])
-            #     with col_ime:
-            #         novo_ime = st.text_input("Sačuvaj novo obrazloženje pod imenom:",
-            #                                  placeholder = "Kardiomiopatija")
-            #     with col_dugme:
-            #         st.space(size = "small")
-            #         if st.button("Sačuvaj obrazloženje"):
-            #             if novo_ime and varijanta["obrazlozenje"]:
-            #                 st.session_state.obrazlozenja[novo_ime] = varijanta["obrazlozenje"]
-            #                 with open("obrazlozenja.json", "w", encoding="utf-8") as f:
-            #                     json.dump(st.session_state.obrazlozenja, f, ensure_ascii=False, indent=4)
-            #                 st.success(f"Šablon '{novo_ime}' je uspešno sačuvan!")
-            #             else:
-            #                 st.warning("Morate uneti i ime bolesti i tekst obrazloženja.")
             
             if st.button(f"🗑️ Ukloni varijantu {i+1}", key=f"remove_{vid}"):
                 st.session_state.varijante.pop(i)
@@ -382,36 +350,20 @@ with st.container(border=True):
                                                 accept_new_options = True,
                                                 help = "Izaberite ili iskucajte novu i kliknite Add: (ili Enter)",
                                                 key = f"dis_{cid}")
-            
             cnv["model"] = st.selectbox("Model nasleđivanja",
                                               ["autozomno dominantno",
                                                "autozomno recesivno",
-                                               "autozomno dominantno ili autozomno recesivno"],
+                                               "autozomno dominantno ili autozomno recesivno",
+                                               "X-vezano recesivno",
+                                               "X-vezano dominantno"],
                                               key=f"mod_{cid}")
-            
             cnv["obrazlozenje"] = st.text_area("Obrazloženje:",
                                                      placeholder = "Napišite novo obrazloženje ili ostavite prazno. Nova obrazloženja biće sačuvana kada sledeći put odaberete istu bolest.",
                                                      height = "content",
                                                      help = "Svaka bolest koja je uneta prvi put biće zapamćena zajedno sa obrazloženjem tako da sledeći put možete da je odaberete",
                                                      key=f"obr_{cid}_{cnv["bolest"]}",
                                                      value=st.session_state.obrazlozenja.get(cnv["bolest"], ""))
-            # cnv["bolest"] = st.text_input("Patogene CNV u genu asocirane su sa:",
-            #                               placeholder = "urođenom arahnodaktilijom (engl. Arachnodactyly, congenital)",
-            #                               key=f"dis_{cid}")
-            # cnv["model"] = st.selectbox("Model nasleđivanja",
-            #                             ["autozomno dominantno",
-            #                              "autozomno recesivno",
-            #                              "autozomno dominantno ili autozomno recesivno"],
-            #                             key=f"mod_{cid}")
-            # cnv_treba_obrazlozenje = st.toggle("Obrazloženje:",
-            #                                    help = "Ova rečenica ide u interpretaciju",
-            #                                    key=f"tobr_{cid}")
-            # if cnv_treba_obrazlozenje:
-            #     cnv["obrazlozenje"] = st.text_area("obrazlozenje",
-            #                                              label_visibility="collapsed",
-            #                                              height = "content",
-            #                                              key=f"obr_{cid}",
-            #                                              value = "Klinička ekspresivnost sindroma je veoma varijabilna, sa rasponom od potpuno asimptomatskih nosilaca do osoba sa izraženijim razvojnim i neurološkim poremećajima. Najčešće prijavljene manifestacije uključuju kašnjenje u govoru, blagu do umerenu intelektualnu ometenost, autizam, epileptičke napade i poremećaje motorike, uključujući i slučajeve cerebralne paralize.")
+
             if st.button(f"🗑️ Ukloni CNV {i+1}", key=f"remove_{cid}"):
                 st.session_state.cnvovi.pop(i)
                 st.rerun()
@@ -456,12 +408,11 @@ with st.container(border=True):
 # Block 6
 with st.container(border=True):
     st.subheader("✍️ Analizator")
-    analizator = st.selectbox("analizator", ["Kris", "Vlada", "Irena", "Anita", "Bojzi", "Makica", "Đole", "Marina","Niko"], label_visibility="collapsed")
-
-# with st.container(border=True):
-#     st.subheader("✍️ Analizator")
-#     analizator = st.text_input("analizator", value = st.session_state.get('name'), label_visibility="collapsed")
-#     authenticator.logout('Odjavi se', 'main')
+    analizator = st.text_input("analizator",
+                               value = st.session_state.get('name'),
+                               label_visibility="collapsed",
+                               disabled = True)
+    authenticator.logout('Odjavi se', 'main')
 
 # Report Generation
 

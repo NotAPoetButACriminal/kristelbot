@@ -1,50 +1,28 @@
 import streamlit as st
 from docxtpl import DocxTemplate
-#import streamlit_authenticator as stauth
-#import yaml
 import io
 import uuid
 import json
 import os
-#from yaml.loader import SafeLoader
 from datetime import datetime
 from ACMG_criteria import ACMG_criteria
 from HPO import HPO
 from analysis_config import analysis_config
 
+st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
+
 ### Login ###
-
-# if "auth_config" not in st.session_state:
-#     with open('/etc/secrets/stauth.yaml', 'r', encoding='utf-8') as file:
-#         st.session_state["auth_config"] = yaml.load(file, Loader=SafeLoader)
-
-# authenticator = stauth.Authenticate(
-#     st.session_state["auth_config"]['credentials'],
-#     st.session_state["auth_config"]['cookie']['name'],
-#     st.session_state["auth_config"]['cookie']['key'],
-#     st.session_state["auth_config"]['cookie']['expiry_days']
-# )
-
-# authenticator.login(fields = {'Form name':'RFZO Genetički Izveštaj',
-#                               'Username':'Email',
-#                               'Password':'Password',
-#                               'Login':'Login',
-#                               'Captcha':'Captcha'})
-
-# if st.session_state.get('authentication_status') is False:
-#     st.error('Pogrešno korisničko ime ili lozinka.')
-#     st.stop()
-# elif st.session_state.get('authentication_status') is None:
-#     st.stop()
 
 if not st.session_state.get("loggedin", False):
     st.title("RFZO Izveštaj Generator")
     with st.form("login"):
-        username = st.text_input("Email:")
-        password = st.text_input("Password:", type="password")
+        username = st.text_input("Email:",
+                                 autocomplete = "username")
+        password = st.text_input("Password:",
+                                 type="password",
+                                 autocomplete ="current-password")
         login = st.form_submit_button("Log in", use_container_width=True)
         if login:
-            users = st.secrets["email"]
             if username in st.secrets["email"] and st.secrets["email"][username]["password"] == password:
                 st.session_state["loggedin"] = True
                 st.session_state["username"] = username
@@ -52,7 +30,7 @@ if not st.session_state.get("loggedin", False):
                 st.rerun()
             else:
                 st.error("Wrong username or password")
-        st.stop()
+    st.stop()
 
 ### Initialize ###
 
@@ -94,11 +72,9 @@ if "obrazlozenja" not in st.session_state:
     with open(obrazlozenja_json, "r", encoding="utf-8") as f:
         st.session_state.obrazlozenja = json.load(f)
 
-### Title ###
-st.set_page_config(page_title="IMGGI Report Generator", layout="centered")
+# Block 1
 st.title("RFZO Genetički Izveštaj")
 
-# Block 1
 with st.container(border=True):
     st.subheader("📋 Opšti Podaci")
 
@@ -106,22 +82,18 @@ with st.container(border=True):
                           format="DD.MM.YYYY",
                           min_value=datetime(1900, 1, 1))
     
-    ustanova = ustanova_opcija = st.selectbox("Ustanova:",
-                                              ["Univerzitetska dečja klinika",
-                                               "Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
-                                               "UKCS - Klinika za ginekologiju i akušerstvo",
-                                               "UKCS - Klinika za neurologiju",
-                                               "UKCS - Klinika za nefrologiju",
-                                               "UKCS - Klinika za kardiologiju",
-                                               "UKCS - Očna klinika",
-                                               "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
-                                               "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
-                                               "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",],
-                                               accept_new_options = True)
-    if ustanova_opcija == "drugo":
-        ustanova = st.text_input("Druga ustanova")
-    else:
-        ustanova = ustanova_opcija
+    ustanova = st.selectbox("Ustanova:",
+                            ["Univerzitetska dečja klinika",
+                             "Institut za zdravstvenu zaštitu majke i deteta Srbije „Dr Vukan Čupić“",
+                             "UKCS - Klinika za ginekologiju i akušerstvo",
+                             "UKCS - Klinika za neurologiju",
+                             "UKCS - Klinika za nefrologiju",
+                             "UKCS - Klinika za kardiologiju",
+                             "UKCS - Klinika za očne bolesti",
+                             "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
+                             "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
+                             "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",],
+                            accept_new_options = True)
     
     lekari = st.text_input("Lekari:",
                            "dr Goran Čuturilo, dr Jelena Ruml Stojanović, dr Brankica Bosankić, dr Marija Mijović",
@@ -319,7 +291,7 @@ with st.container(border=True):
                 st.session_state.varijante.pop(i)
                 st.rerun()
     
-    if st.button("➕ Dodaj novu varijantu"):
+    if st.button("➕ Dodaj novu varijantu", type="primary"):
         st.session_state.varijante.append({"vid": str(uuid.uuid4())})
         st.rerun()
     
@@ -385,7 +357,7 @@ with st.container(border=True):
                 st.session_state.cnvovi.pop(i)
                 st.rerun()
 
-    if st.button("➕ Dodaj novu CNV"):
+    if st.button("➕ Dodaj novu CNV", type="primary"):
         st.session_state.cnvovi.append({"cid": str(uuid.uuid4())})
         st.rerun()
 

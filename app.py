@@ -291,7 +291,7 @@ with st.container(border=True):
                 st.session_state.varijante.pop(i)
                 st.rerun()
     
-    if st.button("➕ Dodaj novu varijantu", type="primary"):
+    if st.button("➕ Dodaj novu varijantu"):
         st.session_state.varijante.append({"vid": str(uuid.uuid4())})
         st.rerun()
     
@@ -357,7 +357,7 @@ with st.container(border=True):
                 st.session_state.cnvovi.pop(i)
                 st.rerun()
 
-    if st.button("➕ Dodaj novu CNV", type="primary"):
+    if st.button("➕ Dodaj novu CNV"):
         st.session_state.cnvovi.append({"cid": str(uuid.uuid4())})
         st.rerun()
 
@@ -445,7 +445,7 @@ if st.button("📄 Generiši Izveštaj", type="primary"):
 
     else:
         try:
-            doc = DocxTemplate("izveštaj_template.docx")
+            doc = DocxTemplate("izvestaj_template.docx")
             context = {
                 "datum": datum.strftime("%d.%m.%Y."),
                 "ustanova": ustanova,

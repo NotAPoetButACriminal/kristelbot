@@ -90,6 +90,7 @@ with st.container(border=True):
                              "UKCS - Klinika za nefrologiju",
                              "UKCS - Klinika za kardiologiju",
                              "UKCS - Klinika za očne bolesti",
+                             "UKCS - Klinika za alergologiju i imunologiju"
                              "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
                              "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
                              "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",],

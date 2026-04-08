@@ -48,6 +48,10 @@ if "literatura" not in st.session_state:
         },
         {
             "id": str(uuid.uuid4()),
+            "tekst": "Lee, Kristy, et al. ACMG SF v3. 3 list for reporting of secondary findings in clinical exome and genome sequencing: A policy statement of the American College of Medical Genetics and Genomics (ACMG). Genetics in Medicine 2025"
+        },
+        {
+            "id": str(uuid.uuid4()),
             "tekst": "Online Mendelian Inheritance in Man, OMIM®, world wide web url: http://omim.org/,” McKusick-Nathans Institute of Genetic Medicine, Johns Hopkins University (Baltimore, MD)"
         },
         {
@@ -90,9 +94,10 @@ with st.container(border=True):
                              "UKCS - Klinika za nefrologiju",
                              "UKCS - Klinika za kardiologiju",
                              "UKCS - Klinika za očne bolesti",
-                             "UKCS - Klinika za alergologiju i imunologiju"
+                             "UKCS - Klinika za alergologiju i imunologiju",
                              "Institut za zdravstvenu zaštitu dece i omladine Vojvodine",
                              "Univerzitetski klinički centar Niš - Klinika za pedijatriju",
+                             "UKC Vojvodine - Klinika za gastroenterologiju i hepatologiju",
                              "Klinika za neurologiju i psihijatriju za decu i omladinu, Beograd",],
                             accept_new_options = True)
     
